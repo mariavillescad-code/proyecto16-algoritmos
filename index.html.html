@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proyecto 16 – Fiscalización y registro de selección aleatoria de métodos</title>
+<style>
+:root{--bg:#eef5f2;--card:#fff;--ink:#10302b;--mut:#587570;--pri:#0f766e;--pri2:#0b4f4a;--acc:#f59e0b;--line:#cfe0da;--side:#0a3733;--sink:#d4efe8;--soft:#e0f1ec;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--bar:#14b8a6;--hl:#fef3c7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#081c19;--card:#0f2a26;--ink:#e2f4ef;--mut:#8db0a9;--pri:#2dd4bf;--pri2:#134e48;--line:#1f4540;--side:#061412;--sink:#b8e3da;--soft:#153631;--okbg:#14391f;--badbg:#401616;--ok:#4ade80;--bad:#f87171;--hl:#4a3a0a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#081c19;--card:#0f2a26;--ink:#e2f4ef;--mut:#8db0a9;--pri:#2dd4bf;--pri2:#134e48;--line:#1f4540;--side:#061412;--sink:#b8e3da;--soft:#153631;--okbg:#14391f;--badbg:#401616;--ok:#4ade80;--bad:#f87171;--hl:#4a3a0a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Trebuchet MS","Segoe UI",Helvetica,Arial,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hide{display:none!important}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700}
+:root[data-theme="dark"] .btn:not(.o):not(.s){color:#06201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.o):not(.s){color:#06201c}}
+.btn.o{background:transparent;color:var(--pri);border:2px solid var(--pri)}
+.btn.s{background:var(--pri2);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700}
+.btn:disabled{opacity:.5}
+.btn.imp{font-size:16px;letter-spacing:.6px;padding:14px 28px;border-radius:12px;border:2px solid var(--pri2);box-shadow:0 5px 0 var(--pri2),0 9px 16px rgba(0,0,0,.22);transition:transform .1s,box-shadow .1s}
+.btn.imp:hover{filter:brightness(1.12)}
+.btn.imp:active{transform:translateY(4px);box-shadow:0 1px 0 var(--pri2)}
+th.main{background:var(--acc);color:#2b1a00}
+th.sec{background:var(--pri)}
+:root[data-theme="dark"] th.sec{color:#06201c}
+tbody tr td.main{background:var(--hl);font-weight:700;border-left:2px solid var(--acc);border-right:2px solid var(--acc)}
+tbody tr td.sec{color:var(--pri);font-weight:600}
+th small{font-weight:400;opacity:.9}
+.btn.rst{flex:1;min-width:200px;background:var(--acc);color:#2b1a00;border:2px solid #b45309;border-radius:12px;padding:12px 16px;font-size:15px;text-align:center;box-shadow:0 4px 0 #b45309}
+:root[data-theme="dark"] .btn.rst{color:#2b1a00}
+.btn.rst:hover{filter:brightness(1.08)}
+.btn.rst:active{transform:translateY(3px);box-shadow:0 1px 0 #b45309}
+/* login */
+#login{min-height:100vh;display:flex;flex-direction:column}
+.lt{background:var(--side);color:#fff;padding:16px 24px;display:flex;gap:14px;align-items:center}
+.logo{font-size:28px;color:var(--acc)}
+.lt b{display:block;font-family:Georgia,serif;font-size:20px}
+.lt span,.tb span{font-size:13px;opacity:.85}
+.lm{flex:1;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,var(--soft),var(--bg))}
+.lc{background:var(--card);border:1px solid var(--line);border-left:8px solid var(--acc);border-radius:16px;padding:28px;width:min(420px,100%)}
+.lc h2{font-size:26px}.lc p{color:var(--mut);margin:6px 0 16px}
+.lc input{width:100%;padding:11px 12px;margin-bottom:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.lc .btn{width:100%;margin-bottom:8px}
+#err{color:var(--bad);min-height:20px;font-size:13px}
+.cred{background:var(--side);color:var(--sink);padding:12px 24px;text-align:center;font-size:13px}
+/* app */
+#app{min-height:100vh;display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto 1fr}
+.tb{grid-column:1/3;background:var(--side);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 20px;position:relative}
+.tb h1{font-size:19px}.tb .t{flex:1}
+.pill{display:inline-block;background:var(--acc);color:#2b1a00;border-radius:99px;padding:1px 12px;font-weight:700;font-size:13px}
+.um{position:relative}
+.um>button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:7px 14px}
+.dd{position:absolute;right:0;top:110%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;min-width:170px;padding:6px;z-index:5}
+.dd button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 10px;border-radius:8px}
+.dd button:hover{background:var(--soft)}.dd hr{border:0;border-top:1px solid var(--line)}
+nav{background:var(--side);padding:12px 10px;display:flex;flex-direction:column;gap:6px}
+nav button{display:flex;gap:10px;align-items:center;background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--sink);border-radius:10px;padding:10px 12px;text-align:left}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#2b1a00;font-weight:700}
+main{padding:20px;min-width:0}
+.ph{display:flex;gap:12px;align-items:center;border-bottom:3px solid var(--acc);padding-bottom:10px;margin-bottom:16px}
+.ph .ic{background:var(--pri);color:#fff;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px}
+.ph h2{font-size:26px}.ph p{margin:0;color:var(--mut)}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;flex:1;min-width:200px}
+.box small{color:var(--mut);display:block}.box strong{font-size:20px}
+.box h3{font-size:16px;margin-bottom:8px;color:var(--pri)}
+.ok{background:var(--okbg);border-color:var(--ok)}.no{background:var(--badbg);border-color:var(--bad)}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{background:var(--pri2);color:#fff;text-align:left;padding:8px 12px}
+td{padding:7px 12px;border-top:1px solid var(--line)}
+tr:nth-child(even) td{background:var(--soft)}
+select,.in{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.bars{display:flex;align-items:flex-end;gap:5px;height:90px}
+.bars i{flex:1;background:var(--bar);border-radius:4px 4px 0 0}
+.bars i.h{background:var(--acc)}
+.prog{height:9px;background:var(--soft);border-radius:9px;overflow:hidden;margin-top:8px}.prog i{display:block;height:100%;width:0;background:var(--pri)}
+.cells{display:flex;gap:5px;flex-wrap:wrap}
+.cells span{background:var(--soft);border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:13px}
+.cells span.f{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:700}
+.hb{display:flex;align-items:center;gap:10px;margin:7px 0}.hb em{font-style:normal;width:210px;font-size:14px}
+.hb div{flex:1;background:var(--soft);border-radius:8px;height:26px;overflow:hidden}.hb div i{display:block;height:100%;background:var(--bar);padding:3px 8px;color:#022;font-size:13px;white-space:nowrap}
+.hb div i.a{background:var(--ok);color:#fff}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tabs button{flex:1;min-width:150px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700}.tabs button.on{background:var(--pri2);color:#fff}
+.chk{margin:6px 0;padding-left:0;list-style:none}.chk li::before{content:"✔ ";color:var(--ok)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:9;padding:16px}
+.modal>div{background:var(--card);border-radius:14px;padding:22px;max-width:420px;width:100%}
+.ref{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+@media(max-width:760px){#app{grid-template-columns:1fr}.tb{grid-column:1}nav{flex-direction:row;overflow-x:auto}nav button{white-space:nowrap}.hb em{width:110px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<section id="login">
+ <div class="lt"><div class="logo">⛁</div><div><b>Métodos de Ordenamiento y Búsqueda</b><span>Proyecto 16 · Fiscalización y registro de selección aleatoria de métodos</span></div></div>
+ <div class="lm"><div class="lc">
+  <h2>Registro de usuario</h2><p>Ingresa tus datos para comenzar a explorar los métodos de ordenamiento y búsqueda.</p>
+  <input id="u" placeholder="Nombre de usuario" autocomplete="off" aria-label="Nombre de usuario">
+  <input id="k" type="password" placeholder="Clave (opcional)" aria-label="Clave (opcional)">
+  <div id="err" role="alert"></div>
+  <button class="btn" id="reg">Registrarse</button>
+  <button class="btn o" id="inv">Ingresar sin clave</button>
+ </div></div>
+ <div class="cred">Santiago Emilio Lopez Zuñiga, Maria Illesca Durantes Victoria &nbsp;|&nbsp; IA utilizada: Claude (Anthropic)</div>
+</section>
+
+<section id="app" class="hide">
+ <header class="tb"><div class="logo">⛁</div><div class="t"><h1>Métodos de Ordenamiento y Búsqueda</h1><span><span class="pill" style="font-size:12px">Proyecto 16</span> Fiscalización y registro de selección aleatoria de métodos</span></div>
+  <div class="um"><button id="ub" aria-haspopup="true">👤 <span id="un">USUARIO</span> ▾</button>
+   <div class="dd hide" id="dd"><button data-m="perfil">Perfil</button><button data-m="config">Configuración</button><button data-m="ayuda">Ayuda</button><hr><button data-m="salir"><b>SALIR</b></button></div></div></header>
+ <nav id="nav"></nav>
+ <main id="view"></main>
+</section>
+<div id="modal" class="modal hide"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S={user:'',cols:[],data:[],file:'',size:0,origin:'',order:null,mode:null,bf:null,alt:{},sf:null,sv:'',last:null,runs:[],finds:[],log:[],cnt:10,page:'intro',stats:{user:{},general:{}}};
+const METHODS=['Quick Sort','Counting Sort','Bucket Sort','Heap Sort','Radix Sort','Merge Sort'];
+const LINEAR_FIELDS=['volumen piezas lote','id pedimento exportacion','fecha empaque'];
+const norm=s=>String(s||'').toLowerCase().replace(/[_\s]+/g,' ').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const hms=()=>new Date().toLocaleTimeString('es-MX');
+const st={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* datos de demostración (30,000) */
+function gen(N){let s=16;const rnd=()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const fn=['Ana','Luis','María','Carlos','Sofía','Diego','Valentina','Andrés','Daniela','Fernando','Santiago','Camila','Mateo','Lucía','Emilio','Paula','Jorge','Elena','Ricardo','Gabriela'];
+ const ln=['Pérez','García','López','Ruiz','Torres','Ramírez','Herrera','Castro','Morales','Díaz','Zuñiga','Durantes','Illesca','Vargas','Reyes','Flores','Ortega','Mendoza','Silva','Rojas'];
+ const ids=Array.from({length:N},(_,i)=>i+1);for(let i=N-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
+ return ids.map((id,idx)=>{
+  const vol=100+Math.floor(rnd()*900);
+  const ped='PED-'+(100000+((idx*73)%899999));
+  const d=1+(idx%28),m=1+(idx%12);
+  const fec=`2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  return [id,fn[Math.floor(rnd()*20)]+' '+ln[Math.floor(rnd()*20)]+' '+ln[Math.floor(rnd()*20)],'ABCDE'[Math.floor(rnd()*5)],vol,ped,fec];
+ })}
+
+/* construcción de la tabla a partir de cualquier archivo: se leen TODAS las columnas */
+const isNum=v=>typeof v=='number'||(typeof v=='string'&&/^\s*-?\d+(\.\d+)?\s*$/.test(v));
+function build(aoa,name,origin,kb){
+ const hd=(aoa[0]||[]).map((h,i)=>String(h==null||h===''?'Columna '+(i+1):h).trim());
+ const rows=aoa.slice(1).filter(r=>r.some(v=>String(v).trim()!==''));
+ if(!hd.length||rows.length<2)throw new Error('vacío');
+ const cols=hd.map((h,i)=>{const vals=rows.map(r=>r[i]).filter(v=>v!==''&&v!=null);const num=vals.length>0&&vals.every(isNum);const c={l:h,num};
+  if(num){let mn=Infinity,mx=-Infinity,dec=0;vals.forEach(v=>{const x=Number(v);if(x<mn)mn=x;if(x>mx)mx=x;if(!Number.isInteger(x)){const d=(String(x).split('.')[1]||'').length;if(d>dec)dec=d}});dec=Math.min(dec,6);Object.assign(c,{min:mn,max:mx,dec,scale:Math.pow(10,dec)})}
+  else c.dist=new Set(vals.map(v=>String(v).trim())).size;
+  return c});
+ S.cols=cols;S.data=rows.map(r=>cols.map((c,i)=>c.num?Number(r[i]===''||r[i]==null?0:r[i]):String(r[i]==null?'':r[i]).trim()));
+ S.file=name;S.origin=origin;S.size=kb;S.order=null;S.mode=null;S.bf=null;S.alt={};S.sf=null;S.sv='';S.last=null;S.runs=[];S.finds=[]}
+
+function parseCSV(t){const first=t.split(/\r?\n/,1)[0];const d=[',',';','\t','|'].map(x=>[x,first.split(x).length]).sort((a,b)=>b[1]-a[1])[0][0];const out=[];let row=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=ch}else if(ch=='"')q=true;else if(ch==d){row.push(f);f=''}else if(ch=='\n'||ch=='\r'){if(ch=='\r'&&t[i+1]=='\n')i++;row.push(f);out.push(row);row=[];f=''}else f+=ch}
+ if(f!==''||row.length){row.push(f);out.push(row)}return out}
+
+function decode(buf){const u=new Uint8Array(buf);if(u[0]==0xFF&&u[1]==0xFE)return new TextDecoder('utf-16le').decode(buf).replace(/^\uFEFF/,'');
+ try{return new TextDecoder('utf-8',{fatal:true}).decode(buf).replace(/^\uFEFF/,'')}catch(e){return new TextDecoder('windows-1252').decode(buf)}}
+
+async function loadFile(f){const ext=f.name.split('.').pop().toLowerCase();let aoa,or='Archivo local';
+ try{
+  if(['xlsx','xls','xlsm'].includes(ext)){if(!window.XLSX){alert('No se pudo cargar el lector de Excel. Revisa tu conexión y recarga la página.');return}
+   const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});let best,bn=-1;
+   wb.SheetNames.forEach(n=>{const ws=wb.Sheets[n];const r=ws['!ref']?XLSX.utils.decode_range(ws['!ref']).e.r:0;if(r>bn){bn=r;best=n}});
+   aoa=XLSX.utils.sheet_to_json(wb.Sheets[best],{header:1,raw:true,defval:''});or+=' · hoja '+best}
+  else aoa=parseCSV(decode(await f.arrayBuffer()));
+  build(aoa,f.name,or,Math.round(f.size/1024))}
+ catch(e){alert('No se pudo leer el archivo. La primera fila debe tener los nombres de las columnas y debe haber al menos 2 filas de datos.');return}
+ go('carga')}
+
+/* algoritmos de ordenación: Quick Sort, Counting Sort, Bucket Sort, Heap Sort, Radix Sort, Merge Sort */
+/* El orden es siempre el mismo: volumen piezas lote → id pedimento exportación → fecha_empaque */
+const keyCols=()=>LINEAR_FIELDS.map(n=>S.cols.findIndex(c=>norm(c.l)===n));
+const missing=()=>['volumen piezas lote','id pedimento exportación','fecha_empaque'].filter((n,i)=>keyCols()[i]<0);
+
+function cmpVal(a,b){if(typeof a==='number'&&typeof b==='number')return a-b;return String(a)<String(b)?-1:String(a)>String(b)?1:0}
+
+function quick(a,k){let c=0,s=0;const t=[[0,a.length-1]];while(t.length){const[l,r]=t.pop();if(l>=r)continue;const p=k(a[l+((r-l)>>1)]);let lt=l,i=l,gt=r;while(i<=gt){const v=k(a[i]);c++;const d1=cmpVal(v,p);if(d1<0){[a[lt],a[i]]=[a[i],a[lt]];s++;lt++;i++}else{c++;const d2=cmpVal(v,p);if(d2>0){[a[gt],a[i]]=[a[i],a[gt]];s++;gt--}else i++}}t.push([l,lt-1],[gt+1,r])}return{a,c,s}}
+
+function radix(a,k,col){let c=0,s=0;let it=a.map(r=>{const v=k(r);return{r,s:col.num?String(Math.round(v*col.scale)):String(v)}});
+ if(col.num){const w=String(Math.round(col.max*col.scale)).length;it.forEach(x=>x.s=x.s.padStart(w,'0'))}
+ const L=it.reduce((m,x)=>Math.max(m,x.s.length),0);
+ for(let p=L-1;p>=0;p--){const cn=new Int32Array(65538);const cd=it.map(x=>{c++;return p<x.s.length?x.s.charCodeAt(p)+1:0});cd.forEach(d=>cn[d+1]++);for(let i=1;i<65538;i++)cn[i]+=cn[i-1];const o=new Array(it.length);it.forEach((x,i)=>{o[cn[cd[i]]++]=x;s++});it=o}
+ return{a:it.map(x=>x.r),c,s}}
+
+/* convierte un valor en texto cuyo orden alfabético coincide con su orden real */
+const isoDate=v=>{const m=String(v).match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:String(v)};
+function encoder(f){
+ const c=S.cols[f];
+ if(c.num){const base=Math.round(c.min*c.scale),w=String(Math.round(c.max*c.scale)-base).length;return v=>String(Math.round(v*c.scale)-base).padStart(w,'0')}
+ const L=S.data.reduce((m,r)=>Math.max(m,isoDate(r[f]).length),0);
+ return v=>isoDate(v).padEnd(L,'\u0000');
+}
+/* cada elemento lleva el registro, su clave compuesta y sus tres partes */
+function decorate(f=keyCols()){
+ const enc=f.map(encoder);
+ return S.data.map(r=>{const p=f.map((i,j)=>enc[j](r[i]));return{r:r.slice(),p,k:p.join(''),f:f[0]}});
+}
+
+/* si todos tienen el mismo formato (PED-123456, 2026-01-31, 500), usa sus dígitos como entero */
+function toInts(parts){
+ const txt=parts.map(t=>t.replace(/\u0000+$/,'')),shape=t=>t.replace(/\d/g,''),first=shape(txt[0]),len=txt[0].length;
+ if(!txt.every(t=>t.length===len&&shape(t)===first&&/\d/.test(t)))return null;
+ return txt.map(t=>Number(t.replace(/\D/g,'')));
+}
+
+/* tres pasadas estables de conteo, del campo menos importante al más importante */
+function counting(a){
+ let c=0,s=0,arr=a;
+ for(let j=2;j>=0;j--){
+  let v=toInts(arr.map(x=>x.p[j])),mn=Infinity,mx=-Infinity;
+  if(v)v.forEach(x=>{c++;if(x<mn)mn=x;if(x>mx)mx=x});
+  if(!v||mx-mn>5e6){
+   const d=[...new Set(arr.map(x=>x.p[j]))].sort(cmpVal);const m=new Map(d.map((x,i)=>[x,i]));v=arr.map(x=>m.get(x.p[j]));mn=0;mx=d.length-1;
+  }
+  const cn=new Int32Array(mx-mn+2);v.forEach(x=>cn[x-mn+1]++);for(let i=1;i<cn.length;i++)cn[i]+=cn[i-1];
+  const o=new Array(arr.length);arr.forEach((x,i)=>{o[cn[v[i]-mn]++]=x;s++});arr=o;
+ }
+ return{a:arr,c,s};
+}
+
+/* cubetas según el primer campo del orden; dentro de cada una, inserción por la clave completa */
+function bucket(a){
+ let c=0,s=0;
+ const n=Math.max(1,Math.min(128,Math.ceil(Math.sqrt(a.length))));
+ const buckets=Array.from({length:n},()=>[]);
+ const vals=toInts(a.map(x=>x.p[0]))||a.map(x=>[0,1,2].reduce((t,i)=>t*65536+(x.p[0].charCodeAt(i)||0),0));
+ let mn=Infinity,mx=-Infinity;vals.forEach(v=>{if(v<mn)mn=v;if(v>mx)mx=v});
+ a.forEach((x,i)=>{c++;buckets[Math.min(n-1,Math.floor((vals[i]-mn)/((mx-mn)||1)*n))].push(x)});
+ const out=[];
+ buckets.forEach(b=>{
+  for(let i=1;i<b.length;i++){
+   let j=i;
+   while(j>0){c++;if(cmpVal(b[j-1].k,b[j].k)>0){[b[j-1],b[j]]=[b[j],b[j-1]];s++;j--}else break}
+  }
+  b.forEach(x=>{out.push(x);s++});
+ });
+ return{a:out,c,s};
+}
+
+function heap(a,k){
+ let c=0,s=0;const arr=a.slice(),n=arr.length;
+ function siftDown(start,end){
+  let root=start;
+  while(root*2+1<=end){
+   let child=root*2+1,swap=root;
+   c++;if(cmpVal(k(arr[swap]),k(arr[child]))<0)swap=child;
+   if(child+1<=end){c++;if(cmpVal(k(arr[swap]),k(arr[child+1]))<0)swap=child+1}
+   if(swap!==root){[arr[root],arr[swap]]=[arr[swap],arr[root]];s++;root=swap}else return;
+  }
+ }
+ for(let i=(n>>1)-1;i>=0;i--)siftDown(i,n-1);
+ for(let end=n-1;end>0;end--){[arr[0],arr[end]]=[arr[end],arr[0]];s++;siftDown(0,end-1)}
+ return{a:arr,c,s};
+}
+
+function mergeSort(a,k){
+ let c=0,s=0;
+ function ms(arr){
+  if(arr.length<=1)return arr;
+  const mid=arr.length>>1;
+  const left=ms(arr.slice(0,mid));
+  const right=ms(arr.slice(mid));
+  const res=[];let i=0,j=0;
+  while(i<left.length&&j<right.length){
+   c++;
+   if(cmpVal(k(left[i]),k(right[j]))<=0){res.push(left[i++]);s++}
+   else{res.push(right[j++]);s++}
+  }
+  while(i<left.length){res.push(left[i++]);s++}
+  while(j<right.length){res.push(right[j++]);s++}
+  return res;
+ }
+ return{a:ms(a.slice()),c,s};
+}
+
+const ALG={'Quick Sort':quick,'Counting Sort':counting,'Bucket Sort':bucket,'Heap Sort':heap,'Radix Sort':radix,'Merge Sort':mergeSort};
+const K=f=>r=>r[f];
+const ORDER_LABEL='Volumen → Pedimento → Fecha';
+// Siempre parte de los datos originales desordenados (S.data), nunca de una ordenación previa
+function runSort(m){
+ const kc=keyCols(),f=pick(kc),ord=[f,...kc.filter(i=>i!==f)],crit=ord.map(i=>S.cols[i].l).join(' → ');
+ const items=decorate(ord);
+ const t0=performance.now();
+ const r=ALG[m](items,x=>x.k,{num:false});
+ const t=(performance.now()-t0)/1000;
+ const run={m,t,c:r.c,s:r.s,h:hms(),f,ord,crit};
+ S.order={a:r.a.map(x=>x.r),...run};S.alt={};S.last=null;
+ S.runs.push(run);S.log.push({h:run.h,tipo:'Ordenamiento',m,f:crit,u:S.user});recStat(m,t);return run}
+function recStat(m,t){['user','general'].forEach(w=>{const x=S.stats[w][m]||(S.stats[w][m]={n:0,t:0});x.n++;x.t+=t});st.set('p16_g',S.stats.general);if(S.user!=='Invitado')st.set('p16_u_'+S.user,S.stats.user)}
+const cnt=(w,m)=>(S.stats[w][m]&&S.stats[w][m].n)||0;
+const avgT=(w,m)=>{const x=S.stats[w][m];return x&&x.n?fmt(x.t/x.n):'—'};
+/* puntaje = número de veces que se ejecutó cada método */
+function scores(w){const o={};METHODS.forEach(m=>o[m]=cnt(w,m));return o}
+/* porcentaje proporcional al total de ejecuciones (suma exacta 100 %) */
+function pcts(s,keys){const tot=keys.reduce((a,m)=>a+s[m],0),o={};if(!tot){keys.forEach(m=>o[m]=0);return o}
+ const r=keys.map(m=>{const v=s[m]*1000/tot;return{m,v,f:Math.floor(v)}});let rem=1000-r.reduce((a,x)=>a+x.f,0);
+ r.slice().sort((x,y)=>(y.v-y.f)-(x.v-x.f)).forEach(x=>{if(rem>0){x.f++;rem--}});r.forEach(x=>o[x.m]=x.f/10);return o}
+
+/* vistas */
+const rowsHtml=(rows,n)=>rows.slice(0,n).map(r=>'<tr>'+r.map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('');
+const heads=()=>S.cols.map(c=>esc(c.l));
+const cntSel=()=>`<select id="cnt" aria-label="Cantidad a visualizar">${[10,25,50,100].map(n=>`<option ${n==S.cnt?'selected':''}>${n}</option>`).join('')}</select>`;
+const tbl=(h,b)=>`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table></div>`;
+const dataTbl=(rows,n)=>tbl(heads(),rowsHtml(rows,n));
+const head=(ic,t,d)=>`<div class="ph"><div class="ic">${ic}</div><div><h2>${t}</h2><p>${d}</p></div></div>`;
+const fmt=t=>t.toFixed(4)+' s';
+const tipo=c=>c.num?(c.dec?'Numérico decimal':'Numérico entero'):'Texto';
+const MENU=[['intro','🏠','Introducción del proyecto'],['carga','🗄','Carga de Datos'],['orden','⇅','Ordenación'],['busca','🔍','Búsqueda'],['rep','📊','Reportes'],['alfa','★','Método Alfa'],['fuentes','📖','Fuentes']];
+function go(p){S.page=p;$('#nav').innerHTML=MENU.map(m=>`<button data-p="${m[0]}" class="${m[0]==p?'on':''}"><span>${m[1]}</span>${m[2]}</button>`).join('');$('#view').innerHTML=V[p]();(B[p]||(()=>{}))()}
+const bindCnt=()=>{const c=$('#cnt');if(c)c.onchange=e=>{S.cnt=+e.target.value;go(S.page)}};
+const V={},B={};
+
+V.intro=()=>head('ℹ','Introducción del proyecto','Bienvenido al Proyecto 16.')+`<div class="row"><div class="box"><h3>¿Qué es este proyecto?</h3>Una aplicación que implementa y visualiza los métodos de ordenamiento y búsqueda más comunes en informática. Trabaja con 30,000 registros, elige el método de ordenación de forma aleatoria y deja constancia de cada selección.</div><div class="box"><h3>¿Qué se busca con él?</h3><ul class="chk"><li>Comprender cómo funcionan los algoritmos.</li><li>Comparar su rendimiento con benchmarking.</li><li>Fiscalizar qué método se seleccionó y cuándo.</li></ul></div></div><div class="row"><div class="box"><h3>Investigación y profundidad</h3>Ordenamiento: Quick Sort, Counting Sort, Bucket Sort, Heap Sort, Radix Sort y Merge Sort. Búsqueda: lineal y binaria. Reportes comparativos, Método Alfa personalizado y referencias en formato APA.</div><div class="box"><h3>En resumen</h3>Una herramienta educativa y analítica para explorar, comparar y comprender los métodos de ordenamiento y búsqueda.<br><br>Selecciona una opción del menú para comenzar.</div></div>`;
+
+V.carga=()=>head('🗄','Carga de Datos','Selecciona un archivo (Excel, CSV o TXT) para cargar los datos y visualiza su información.')+`<div class="row"><div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;align-items:flex-start;justify-content:center"><button type="button" class="btn imp" id="imp">📥 IMPORTAR DATOS</button><small style="color:var(--mut)">Excel, CSV o TXT</small><input type="file" id="fi" accept=".xlsx,.xls,.xlsm,.csv,.txt" class="hide"></div><div class="box ok"><small>Archivo cargado</small><strong>${esc(S.file)}</strong><small>Tamaño: ${S.size.toLocaleString('es-MX')} KB · ${S.data.length.toLocaleString('es-MX')} registros · ${S.cols.length} campos</small></div><div class="box"><small>Origen de los datos</small><strong style="font-size:16px">${esc(S.origin)}</strong></div></div>`+tbl(['CAMPO','ORIGEN','TIPO','EJEMPLO'],S.cols.map((c,i)=>`<tr><td>${esc(c.l)}</td><td>Archivo</td><td>${tipo(c)}</td><td>${esc(S.data[0][i])}</td></tr>`).join(''))+`<p><b>Cantidad de registros a visualizar:</b> ${cntSel()}</p><h3>Primeros registros</h3>${dataTbl(S.data,S.cnt)}<h3 style="margin-top:14px">Últimos registros</h3>${dataTbl(S.data.slice(-S.cnt),S.cnt)}`;
+B.carga=()=>{bindCnt();$('#imp').onclick=()=>$('#fi').click();$('#fi').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)loadFile(f)}};
+
+/* Ordenación: sin selector de campo */
+const noCols=()=>`<div class="box no" style="margin-bottom:14px">El archivo cargado no tiene estas columnas: <b>${missing().map(esc).join(', ')}</b>. Carga un archivo que las incluya.</div>`;
+const barsOf=(rows,f)=>{const c=S.cols[f],num=v=>c.num?Number(v)||0:(Number(String(v).replace(/\D/g,''))||0),v=Array.from({length:12},(_,i)=>num(rows[Math.floor(i*(rows.length-1)/11)][f])),mn=Math.min(...v),mx=Math.max(...v);return v.map(x=>`<i style="height:${8+92*(x-mn)/((mx-mn)||1)}%"></i>`).join('')};
+const ordTbl=(rows,n)=>{const k=S.order.ord,tag=['ORDEN PRINCIPAL','desempate 2º','desempate 3º'];
+ const cls=i=>{const j=k.indexOf(i);return j==0?'main':j>0?'sec':''};
+ const th=S.cols.map((c,i)=>{const j=k.indexOf(i);return `<th class="${cls(i)}">${esc(c.l)}${j>=0?`<br><small>${j==0?'▲ ':''}${tag[j]}</small>`:''}</th>`}).join('');
+ const body=rows.slice(0,n).map(r=>'<tr>'+r.map((v,i)=>`<td class="${cls(i)}">${esc(v)}</td>`).join('')+'</tr>').join('');
+ return `<div class="tw"><table><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table></div>`};
+
+V.orden=()=>{
+ const h=head('⇅','Ordenación','En cada ejecución se sortea el campo principal entre volumen piezas lote, id pedimento exportación y fecha_empaque; los otros dos sirven de desempate.');
+ if(missing().length)return h+noCols();
+ const o=S.order,src=o?o.a:S.data,kc=o?o.ord:keyCols();
+ return h+`<div class="row"><div class="box"><small>🎲 El campo principal se sortea entre:</small>• volumen piezas lote<br>• id pedimento exportación<br>• fecha_empaque<br><br><button class="btn" id="go">▶ Ejecutar ordenación</button></div><div class="box"><small>🎲 Método seleccionado aleatoriamente</small><strong id="om">${o?o.m:'—'}</strong></div><div class="box ${o?'ok':''}"><small>📌 Ordenado en base al campo</small><strong>${o?esc(S.cols[kc[0]].l):'—'}</strong><small>${o?'Campo principal (sorteado). Desempate: '+esc(S.cols[kc[1]].l)+' → '+esc(S.cols[kc[2]].l):'Ejecuta la ordenación para verlo'}</small></div><div class="box"><small>Registros a visualizar</small>${cntSel()}</div></div>
+<div class="row"><div class="box" style="flex:2"><h3>Estado de ordenamiento</h3><small>${esc(S.cols[kc[0]].l)} en 12 posiciones repartidas por la lista</small><div class="bars">${barsOf(src,kc[0])}</div><div class="prog"><i style="width:${o?100:0}%"></i></div><small>${o?'Ordenamiento completado desde los datos originales ('+o.m+')':'En espera'}</small></div><div class="box"><h3>⏱ Benchmarking</h3>Tiempo de ejecución: <b>${o?fmt(o.t):'—'}</b><br>Comparaciones: <b>${o?o.c.toLocaleString('es-MX'):'—'}</b><br>Intercambios / movimientos: <b>${o?o.s.toLocaleString('es-MX'):'—'}</b></div></div><h3>Registros ordenados</h3><div id="ot">${o?ordTbl(o.a,S.cnt):tbl(heads(),`<tr><td colspan="${S.cols.length}">Ejecuta una ordenación para ver los registros.</td></tr>`)}</div>`;
+};
+B.orden=()=>{
+ bindCnt();
+ const b=$('#go');if(b)b.onclick=()=>{runSort(pick(METHODS));go('orden')};
+};
+
+/* Búsqueda: siempre sobre la lista obtenida en Ordenación */
+function lin(a,k,eq){let c=0,it=0;for(let i=0;i<a.length;i++){it++;c++;if(eq(k(a[i])))return{i,c,it}}return{i:-1,c,it}}
+/* binaria: devuelve la primera aparición del valor */
+function bin(a,k,v){let l=0,h=a.length-1,c=0,it=0,found=-1;while(l<=h){it++;const m=(l+h)>>1;c++;const d=cmpVal(k(a[m]),v);if(d<0)l=m+1;else{if(d===0)found=m;h=m-1}}return{i:found,c,it}}
+const searchField=()=>{const f=keyCols();return S.mode=='bin'?S.bf:(S.sf!=null&&S.cols[S.sf]?S.sf:f[0])};
+/* la binaria exige que la lista esté ordenada por su campo: se reordena con el método obtenido en Ordenación */
+function searchList(){
+ const f=searchField(),k=keyCols();
+ if(S.mode!='bin'||f===S.order.f)return S.order.a;
+ return S.alt[f]||(S.alt[f]=ALG[S.order.m](decorate([f,...k.filter(i=>i!==f)]),x=>x.k,{num:false}).a.map(x=>x.r));
+}
+/* sorteo 50 % lineal / 50 % binaria; en binaria el campo sale al azar entre los tres */
+function drawSearch(){
+ S.mode=Math.random()<0.5?'lin':'bin';
+ S.bf=S.mode=='bin'?pick(keyCols()):null;S.sv='';S.last=null;
+ S.log.push({h:hms(),tipo:'Búsqueda',m:S.mode=='bin'?'Búsqueda Binaria':'Búsqueda Lineal',f:S.mode=='bin'?S.cols[S.bf].l:'Lo elige el usuario',u:S.user});
+}
+
+function resultHtml(){
+ const x=S.last,a=x&&x.list;
+ if(!x)return`<div class="box">Escribe un dato (o usa un valor existente) y pulsa Buscar.</div>`;
+ const name=esc(S.cols[x.f].l),r=x.r,found=r.i>=0;
+ const from=Math.max(0,(found?r.i:0)-5);
+ const cells=a.slice(from,from+11).map((row,i)=>`<span class="${found&&from+i===r.i?'f':''}">${esc(String(row[x.f]).slice(0,14))}</span>`).join('');
+ const rows=x.hits.slice(0,S.cnt).map(i=>`<tr><td>${i+1}</td>${a[i].map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('');
+ return`<div class="row"><div class="box ${found?'ok':'no'}" id="sr"><strong>${found?'✔ Encontrado':'✖ No encontrado'}</strong><br>${name}: <b>${esc(x.v)}</b>${found?`<br>Primera posición en la lista ordenada: <b>${r.i+1}</b><br>Coincidencias: <b>${x.hits.length}</b>`:''}</div><div class="box" style="flex:2"><h3>Proceso de búsqueda</h3><div class="cells">${cells}</div><div class="prog"><i style="width:100%"></i></div><small>${x.m} completada</small></div><div class="box"><h3>⏱ Benchmarking</h3>Tiempo de ejecución: <b>${fmt(x.t)}</b><br>Comparaciones: <b>${r.c.toLocaleString('es-MX')}</b><br>Iteraciones: <b>${r.it.toLocaleString('es-MX')}</b></div></div>`+(found?`<h3>Resultados (en el orden de ${S.order.m}) — ${Math.min(S.cnt,x.hits.length)} de ${x.hits.length}</h3>${tbl(['Posición',...heads()],rows)}`:'');
+}
+
+V.busca=()=>{
+ const h=head('🔍','Búsqueda','Busca sobre la lista que se obtuvo en el apartado de Ordenación.');
+ if(missing().length)return h+noCols();
+ if(!S.order)return h+`<div class="box no">Primero ejecuta una ordenación. La búsqueda usa esa lista ordenada.<br><br><button class="btn" id="toOrd">⇅ Ir a Ordenación</button></div>`;
+ const draw=`<button class="btn s" id="rnd">🎲 Elegir búsqueda al azar</button>`;
+ const info=`<div class="box"><small>Lista ordenada con</small><strong>${S.order.m}</strong><small>${esc(S.order.crit)} · ${S.order.h}</small></div>`;
+ if(!S.mode)return h+`<div class="row"><div class="box"><small>Tipo de búsqueda</small><strong>Sin elegir</strong><br>${draw}</div>${info}</div>`;
+ const isBin=S.mode=='bin',f=searchField();
+ const field=isBin?`<strong style="font-size:16px">${esc(S.cols[f].l)}</strong><small>Elegido al azar. Lista ordenada por este campo con ${S.order.m}.</small>`:`<select id="sf" aria-label="Campo donde buscar">${S.cols.map((c,i)=>`<option value="${i}" ${i==f?'selected':''}>${esc(c.l)}</option>`).join('')}</select><small>Búsqueda lineal: puedes buscar en cualquier campo.</small>`;
+ return h+`<div class="row"><div class="box"><small>🎲 Búsqueda seleccionada al azar</small><strong>${isBin?'Búsqueda Binaria':'Búsqueda Lineal'}</strong><br>${draw}</div>${info}<div class="box"><small>Registros a visualizar</small>${cntSel()}</div></div><div class="row"><div class="box"><small>Campo donde se busca</small>${field}</div><div class="box" style="flex:2"><small>Dato a buscar</small><input class="in" id="sv" value="${esc(S.sv)}" placeholder="Escribe el dato" aria-label="Dato a buscar" autocomplete="off"> <button class="btn o" id="ex">🎯 Usar valor existente</button> <button class="btn" id="gs">▶ Buscar</button><div id="se" role="alert" style="color:var(--bad);font-size:13px"></div></div></div>`+resultHtml();
+};
+
+B.busca=()=>{
+ const t=$('#toOrd');if(t)t.onclick=()=>go('orden');
+ if(!$('#rnd'))return;
+ $('#rnd').onclick=()=>{drawSearch();go('busca')};
+ if(!S.mode)return;
+ bindCnt();
+ const clear=()=>{S.sv='';S.last=null;go('busca')};
+ const sel=$('#sf');if(sel)sel.onchange=()=>{S.sf=+sel.value;clear()};
+ $('#sv').oninput=e=>{S.sv=e.target.value};
+ $('#sv').onkeydown=e=>{if(e.key=='Enter')$('#gs').click()};
+ $('#ex').onclick=()=>{S.sv=String(pick(S.order.a)[searchField()]);S.last=null;go('busca')};
+ $('#gs').onclick=()=>{
+  const f=searchField(),col=S.cols[f],raw=S.sv.trim(),a=searchList();
+  if(!raw){$('#se').textContent='Escribe un dato o pulsa «Usar valor existente».';return}
+  if(col.num&&!isNum(raw)){$('#se').textContent='Este campo es numérico: escribe un número.';return}
+  const v=col.num?Number(raw):raw,k=K(f);
+  const eq=col.num?x=>x===v:x=>String(x).toLowerCase()===v.toLowerCase();
+  const isBin=S.mode=='bin',m=isBin?'Búsqueda Binaria':'Búsqueda Lineal';
+  const target=!isBin||col.num?v:(a.map(k).find(eq)??v);
+  const t0=performance.now();
+  const r=isBin?bin(a,k,target):lin(a,k,eq);
+  const time=(performance.now()-t0)/1000;
+  const hits=[];a.forEach((row,i)=>{if(eq(k(row)))hits.push(i)});
+  S.last={list:a,f,v:raw,r,t:time,m,hits};
+  S.finds.push({f,m,t:time,c:r.c,it:r.it,h:hms()});recStat(m,time);
+  go('busca');
+ };
+};
+
+let rtab='so';
+const agg=(arr,order)=>order.map(m=>{const x=arr.filter(r=>r.m==m);return x.length?{m,n:x.length,t:x.reduce((a,r)=>a+r.t,0)/x.length,c:x.reduce((a,r)=>a+r.c,0)/x.length}:null}).filter(Boolean);
+const chart=(title,items,val,txt)=>{const mx=Math.max(...items.map(val),1e-9);return `<div class="box"><h3>${title}</h3>${items.map(x=>`<div class="hb"><em>${x.m} (${txt(x)})</em><div><i style="width:${Math.max(3,100*val(x)/mx)}%"></i></div></div>`).join('')}</div>`};
+const benchCharts=(arr,order)=>{const g=agg(arr,order);return `<div class="row">${chart('Tiempo promedio por método',g,x=>x.t,x=>fmt(x.t))}${chart('Comparaciones promedio por método',g,x=>x.c,x=>Math.round(x.c).toLocaleString('es-MX'))}</div>`};
+const SMETH=['Búsqueda Lineal','Búsqueda Binaria'];
+V.rep=()=>{let b='';const L=f=>esc(S.cols[f]?S.cols[f].l:'—');
+ if(rtab=='so')b=S.runs.length?'<h3 style="margin:0 0 8px">Gráficas</h3>'+benchCharts(S.runs,METHODS)+'<h3 style="margin:14px 0 6px">Detalle de cada ejecución</h3>'+tbl(['Hora','Criterio','Método','Tiempo','Comparaciones','Intercambios'],S.runs.slice().reverse().map(r=>`<tr><td>${r.h}</td><td>${esc(r.crit)}</td><td>${r.m}</td><td>${fmt(r.t)}</td><td>${r.c.toLocaleString('es-MX')}</td><td>${r.s.toLocaleString('es-MX')}</td></tr>`).join('')):'<div class="box">Aún no hay ordenaciones con estos datos. Ejecuta una en el módulo Ordenación.</div>';
+ if(rtab=='bs')b=S.finds.length?'<h3 style="margin:0 0 8px">Gráficas</h3>'+benchCharts(S.finds,SMETH)+'<h3 style="margin:14px 0 6px">Detalle de cada búsqueda</h3>'+tbl(['Hora','Campo','Método','Tiempo','Comparaciones','Iteraciones'],S.finds.slice().reverse().map(r=>`<tr><td>${r.h}</td><td>${L(r.f)}</td><td>${r.m}</td><td>${fmt(r.t)}</td><td>${r.c.toLocaleString('es-MX')}</td><td>${r.it.toLocaleString('es-MX')}</td></tr>`).join('')):'<div class="box">Aún no hay búsquedas con estos datos. Ejecuta una en el módulo Búsqueda.</div>';
+ if(rtab=='ac'){const last=METHODS.map(m=>S.runs.filter(x=>x.m==m).pop()).filter(Boolean);const mx=Math.max(...last.map(x=>x.t),1e-9);
+  b=last.length?`<div class="tw"><table><thead><tr><th colspan="5">Última ejecución de cada método</th></tr><tr><th>MÉTODO</th><th>CAMPO PRINCIPAL</th><th>TIEMPO</th><th>COMPARACIONES</th><th>MOVIMIENTOS</th></tr></thead><tbody>${last.map(x=>`<tr><td>${x.m}</td><td>${esc(S.cols[x.f].l)}</td><td>${fmt(x.t)}</td><td>${x.c.toLocaleString('es-MX')}</td><td>${x.s.toLocaleString('es-MX')}</td></tr>`).join('')}</tbody></table></div><h3 style="margin:14px 0 6px">Comparación gráfica por método</h3><div class="box">${last.map(x=>`<div class="hb"><em>${x.m} (${fmt(x.t)})</em><div><i style="width:${Math.max(4,100*x.t/mx)}%"></i></div></div>`).join('')}</div>`:'<div class="box">Ejecuta una ordenación para ver el análisis comparativo.</div>'}
+ if(rtab=='lg')b=S.log.length?tbl(['Hora','Tipo','Método seleccionado','Campo','Usuario'],S.log.slice().reverse().map(x=>`<tr><td>${x.h}</td><td>${x.tipo}</td><td>${x.m}</td><td>${esc(x.f)}</td><td>${esc(x.u)}</td></tr>`).join('')):'<div class="box">Aún no hay selecciones registradas.</div>';
+ return head('📊','Reportes','Selecciona una opción del submenú para consultar el benchmarking, el análisis comparativo o el registro de selección.')+`<div class="tabs">${[['so','Benchmarking de Ordenamiento'],['bs','Benchmarking de Búsqueda'],['ac','Análisis Comparativo'],['lg','Registro de selección aleatoria']].map(t=>`<button data-t="${t[0]}" class="${t[0]==rtab?'on':''}">${t[1]}</button>`).join('')}</div>`+b};
+B.rep=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{rtab=b.dataset.t;go('rep')})};
+
+V.alfa=()=>{const su=scores('user'),sg=scores('general');
+ const best=s=>{const m=Object.entries(s).sort((a,b)=>b[1]-a[1])[0];return m&&m[1]?m[0]:'Sin datos'};
+ const tot=s=>Object.values(s).reduce((a,x)=>a+x,0);
+ const bars=s=>{const p=pcts(s,METHODS),b=best(s),t=tot(s);return METHODS.map(m=>`<div class="hb"><em>${m}${b==m?' ★ ALFA':''} (${s[m]} ${s[m]==1?'vez':'veces'} · ${p[m].toFixed(1)}%)</em><div><i class="${b==m?'a':''}" style="width:${p[m]}%"></i></div></div>`).join('')+`<small>Total: ${t} ejecuciones${t?' = 100 %':''}</small>`};
+ const execRows=keys=>keys.map(m=>`<tr><td>${m}</td><td>${cnt('user',m)}</td><td>${cnt('general',m)}</td><td>${avgT('user',m)}</td><td>${avgT('general',m)}</td></tr>`).join('')+`<tr><td><b>Total</b></td><td><b>${keys.reduce((a,m)=>a+cnt('user',m),0)}</b></td><td><b>${keys.reduce((a,m)=>a+cnt('general',m),0)}</b></td><td></td><td></td></tr>`;
+ const EH=['MÉTODO','EJECUCIONES (USUARIO)','EJECUCIONES (GENERAL)','TIEMPO PROMEDIO (USUARIO)','TIEMPO PROMEDIO (GENERAL)'];
+ const us=st.get('p16_users')||{},names=[...new Set([...Object.keys(us),S.user])];
+ const board=names.map(n=>{const s=n===S.user?S.stats.user:(st.get('p16_u_'+n)||{});const c=METHODS.map(m=>(s[m]&&s[m].n)||0),t=c.reduce((a,x)=>a+x,0);return{n,c,t,a:t?METHODS[c.indexOf(Math.max(...c))]:'Sin datos'}}).sort((a,b)=>b.t-a.t);
+ return head('★','Método Alfa','Visualiza el algoritmo Alfa del usuario registrado y el Alfa general. El puntaje es el número de veces que se ejecutó cada método.')+`<div class="row"><div class="box"><small>★ Alfa Usuario (${esc(S.user)})</small><strong>${best(su)}</strong></div><div class="box"><small>🏆 Alfa General</small><strong>${best(sg)}</strong></div><button class="btn rst" id="ra">⟳ Reiniciar Alfa del Usuario<br><small style="color:inherit">No afecta el Alfa General</small></button></div><div class="row"><div class="box"><h3>Método Alfa — Usuario registrado</h3>${bars(su)}</div><div class="box"><h3>Método Alfa — General</h3>${bars(sg)}</div></div>`
+ +'<h3 style="margin:14px 0 6px">Ejecuciones de cada método de ordenamiento</h3>'+tbl(EH,execRows(METHODS))
+ +'<h3 style="margin:14px 0 6px">Ejecuciones de cada método de búsqueda</h3>'+tbl(EH,execRows(SMETH))
+ +'<h3 style="margin:14px 0 6px">Puntaje por usuario (veces que ejecutó cada método de ordenamiento)</h3>'+tbl(['USUARIO',...METHODS.map(m=>m.toUpperCase()),'TOTAL','ALFA'],board.map(x=>`<tr${x.n===S.user?' style="font-weight:700"':''}><td>${esc(x.n)}${x.n===S.user?' (tú)':''}</td>${x.c.map(v=>`<td>${v}</td>`).join('')}<td>${x.t}</td><td>${x.a}</td></tr>`).join(''))
+ +(S.user==='Invitado'?'<p style="color:var(--mut);font-size:13px">«Invitado» no guarda puntaje. Regístrate con un nombre para conservarlo.</p>':'')
+ +tbl(['ÁMBITO','ALGORITMO ALFA','PUNTAJE','ESTADO DE CONTROL'],`<tr><td>Usuario registrado</td><td>${best(su)}</td><td>${Math.max(0,...Object.values(su))} ejecuciones</td><td>Reiniciable de forma independiente</td></tr><tr><td>General (acumulado global)</td><td>${best(sg)}</td><td>${Math.max(0,...Object.values(sg))} ejecuciones</td><td>Protegido (sin afectación por reinicio)</td></tr>`)
+ +'<p style="color:var(--mut);font-size:13px">El puntaje de un método es el número de veces que se ejecutó. Cada porcentaje es su parte del total de ejecuciones (todos suman 100 %). El Alfa es el método más ejecutado.</p>'};
+B.alfa=()=>{$('#ra').onclick=()=>{S.stats.user={};if(S.user!=='Invitado')st.set('p16_u_'+S.user,{});go('alfa')}};
+
+V.fuentes=()=>head('📖','Fuentes','Referencias bibliográficas en formato APA y recursos utilizados en la elaboración del proyecto.')+`<h3 style="margin-bottom:8px">Referencias bibliográficas (formato APA)</h3><div class="ref">Cormen, T. H., Leiserson, C. E., Rivest, R. L., &amp; Stein, C. (2022). <i>Introduction to algorithms</i> (4th ed.). MIT Press.</div><div class="ref">Knuth, D. E. (1998). <i>The art of computer programming: Vol. 3. Sorting and searching</i> (2nd ed.). Addison-Wesley.</div><div class="ref">Sedgewick, R., &amp; Wayne, K. (2011). <i>Algorithms</i> (4th ed.). Addison-Wesley Professional.</div><h3 style="margin:14px 0 8px">Recursos y herramientas utilizadas</h3>`+tbl(['CATEGORÍA','RECURSO / HERRAMIENTA','APLICACIÓN EN EL PROYECTO'],'<tr><td>Diseño UI / UX</td><td>Prototipado de interfaz</td><td>Maquetación centrada en el usuario</td></tr><tr><td>Desarrollo</td><td>HTML5, CSS3 y JavaScript (SheetJS para leer Excel)</td><td>Implementación de algoritmos y vistas</td></tr><tr><td>Inteligencia artificial</td><td>Modelos de IA generativa (Claude)</td><td>Apoyo en diseño visual y estructura</td></tr><tr><td>Fuente de datos</td><td>Archivo cargado por el usuario (30,000 registros)</td><td>Conjunto de prueba y benchmarking</td></tr>')+'<p style="color:var(--mut)">Desarrollo: Santiago Emilio Lopez Zuñiga, Maria Illesca Durantes Victoria.</p>';
+
+/* sesión */
+function enter(name){S.user=name;S.stats.general=st.get('p16_g')||{};S.stats.user=(name!=='Invitado'&&st.get('p16_u_'+name))||{};S.log=[];
+ const rows=gen(30000);build([['ID','Nombre','Categoría','volumen piezas lote','id pedimento exportación','fecha_empaque'],...rows],'datos_proyecto16.txt (demostración)','Datos de demostración · carga tu archivo Excel/CSV',Math.round(rows.reduce((a,r)=>a+r.reduce((x,y)=>x+String(y).length,0)+6,0)/1024));
+ $('#un').textContent=name.toUpperCase();$('#login').classList.add('hide');$('#app').classList.remove('hide');go('intro')}
+const hash=s=>{let h=5381;for(const c of s)h=(h*33^c.charCodeAt(0))>>>0;return h};
+$('#reg').onclick=()=>{const u=$('#u').value.trim(),k=$('#k').value;if(!u){$('#err').textContent='Escribe un nombre de usuario.';return}
+ const us=st.get('p16_users')||{};if(u in us&&us[u]!==null&&us[u]!==(k?hash(k):null)){$('#err').textContent='La clave no coincide con este usuario.';return}
+ us[u]=k?hash(k):null;st.set('p16_users',us);enter(u)};
+$('#inv').onclick=()=>{const u=$('#u').value.trim()||'Invitado';const us=st.get('p16_users')||{};if(u in us&&us[u]!==null){$('#err').textContent='Este usuario tiene clave. Escríbela y pulsa Registrarse.';return}if(u!=='Invitado'&&!(u in us)){us[u]=null;st.set('p16_users',us)}enter(u)};
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.p)};
+$('#ub').onclick=()=>$('#dd').classList.toggle('hide');
+function modal(h){const m=$('#modal');m.innerHTML=`<div>${h}<p style="text-align:right;margin:14px 0 0"><button class="btn" id="mc">Cerrar</button></p></div>`;m.classList.remove('hide');$('#mc').onclick=()=>m.classList.add('hide')}
+$('#dd').onclick=e=>{const b=e.target.closest('button');if(!b)return;$('#dd').classList.add('hide');const m=b.dataset.m;
+ if(m=='salir'){$('#app').classList.add('hide');$('#login').classList.remove('hide');$('#k').value='';$('#err').textContent=''}
+ if(m=='perfil')modal(`<h3>Perfil</h3><p>Usuario: <b>${esc(S.user)}</b><br>Ordenaciones en esta sesión: ${S.runs.length}<br>Búsquedas en esta sesión: ${S.finds.length}</p>`);
+ if(m=='config'){modal(`<h3>Configuración</h3><p>Tema de la página:</p><select id="th"><option value="">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select>`);$('#th').onchange=e=>{e.target.value?document.documentElement.dataset.theme=e.target.value:delete document.documentElement.dataset.theme}}
+ if(m=='ayuda')modal('<h3>Ayuda</h3><p>1) Carga tu archivo Excel, CSV o TXT en Carga de Datos. 2) En Ordenación pulsa Ejecutar: se ordena por volumen, pedimento y fecha con un método aleatorio. 3) En Búsqueda pulsa «Elegir búsqueda al azar» (50 % lineal, 50 % binaria). En la binaria el campo también sale al azar. 4) Revisa Reportes y el Método Alfa.</p>')};
+</script>
+</body>
+</html>
